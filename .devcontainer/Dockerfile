@@ -9,7 +9,7 @@ RUN . /etc/os-release \
   && apt-get -y install --no-install-recommends ruby-dev ruby-rubygems bundler \
   && apt-get -y install --no-install-recommends fonts-ipaexfont fonts-morisawa-bizud-gothic fonts-morisawa-bizud-mincho fnt \
   && apt-get -y install --no-install-recommends pipx \
-  && apt-get -y install --no-install-recommends direnv plantuml graphviz \
+  && apt-get -y install --no-install-recommends direnv tig plantuml graphviz \
   && apt-get autoremove -y \
   && rm -rf /var/lib/apt/lists/*
 
@@ -26,6 +26,11 @@ RUN mkdir -p /etc/apt/keyrings \
   && chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list \
   && apt update \
   && apt install -y eza
+
+## Install git-delta
+RUN curl -fsSL https://github.com/dandavison/delta/releases/download/0.17.0/git-delta_0.17.0_amd64.deb -o git-delta_amd64.deb \
+  && dpkg -i git-delta_amd64.deb \
+  && rm -f git-delta_amd64.deb
 
 ## Install tbls
 COPY --from=tbls /usr/bin/tbls /usr/local/bin/tbls
