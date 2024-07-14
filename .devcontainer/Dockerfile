@@ -5,7 +5,7 @@ FROM buildpack-deps:bookworm
 RUN . /etc/os-release \
   && echo "deb http://deb.debian.org/debian ${VERSION_CODENAME}-backports main" > /etc/apt/sources.list.d/backports.list \
   && apt-get update && export DEBIAN_FRONTEND=noninteractive \
-  && apt-get -y install --no-install-recommends bash-completion build-essential gpg \
+  && apt-get -y install --no-install-recommends bash-completion build-essential gpg vim \
   && apt-get -y install --no-install-recommends ruby-dev ruby-rubygems bundler \
   && apt-get -y install --no-install-recommends fonts-ipaexfont fonts-morisawa-bizud-gothic fonts-morisawa-bizud-mincho fnt \
   && apt-get -y install --no-install-recommends pipx \
