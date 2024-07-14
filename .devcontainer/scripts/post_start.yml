@@ -1,6 +1,5 @@
 - name: Execute post start task
   hosts: all
   become: false
-  become: false
   gather_facts: false
   tasks: []

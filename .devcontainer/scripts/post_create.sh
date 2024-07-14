@@ -70,6 +70,19 @@ if [ ! -e "${HOME}/.local/bin/ansible" ]; then
   pipx install ansible --include-deps
 fi
 
+if [ ! -e "${HOME}/.local/bin/ansible-lint" ]; then
+  pipx install ansible-lint
+fi
+
+if [ ! -e "${HOME}/.local/bin/mkdocs" ]; then
+  pipx install mkdocs
+  pipx inject mkdocs mkdocs-material mkdocs-git-revision-date-localized-plugin mkdocs-glightbox mkdocs-section-index mkdocs-literate-nav
+fi
+
+if [ ! -e "${HOME}/.local/bin/mycli" ]; then
+  pipx install mycli --include-deps
+fi
+
 if [ -e "${PWD}/.devcontainer/scripts/post_create.yml" ]; then
   cd "${PWD}/.devcontainer/scripts" || exit 1
   ansible-playbook post_create.yml -i 127.0.0.1, -c local
