@@ -16,7 +16,23 @@
 			// "userUid": "automatic",
 			// "userGid": "automatic",
 			// "nonFreePackages": false
-		}
+		},
+		// "ghcr.io/devcontainers-contrib/features/ansible:2": {
+		// 	"version": "latest"
+		// },
+		// "ghcr.io/hspaans/devcontainer-features/ansible-lint:1": {
+		// 	"version": "latest"
+		// },
+		// "ghcr.io/devcontainers-contrib/features/mkdocs:2": {
+		// 	"version": "latest",
+		// 	"plugins": [
+		// 		"mkdocs-material",
+		// 		"mkdocs-glightbox",
+		// 		"mkdocs-git-revision-date-localized-plugin",
+		// 		"mkdocs-section-index",
+		// 		"mkdocs-literate-nav"
+		// 	]
+		// }
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// This can be used to network with other containers or the host.

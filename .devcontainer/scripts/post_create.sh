@@ -8,6 +8,10 @@ curl -fsSL https://raw.githubusercontent.com/mernen/completion-ruby/main/complet
 curl -fsSL https://raw.githubusercontent.com/mernen/completion-ruby/main/completion-rake -o "${HOME}/.local/share/bash-completion/completions/rake"
 curl -fsSL https://raw.githubusercontent.com/mernen/completion-ruby/main/completion-rails -o "${HOME}/.local/share/bash-completion/completions/rails"
 
+if type "direnv" >/dev/null 2>&1; then
+  echo 'eval "$(direnv hook bash)"' >>~/.bashrc
+fi
+
 if type "eza" >/dev/null 2>&1; then
   echo 'alias ls="eza --git --header"' >>~/.bashrc
 fi
@@ -28,17 +32,8 @@ fi
 
 source "${HOME}/.bashrc"
 
-pipx install ansible --include-deps
-pipx install mkdocs --include-deps
-pipx inject mkdocs mkdocs-material mkdocs-glightbox mkdocs-git-revision-date-localized-plugin mkdocs-section-index mkdocs-literate-nav
-pipx install mycli
-
 if [ ! -e ~/.my.cnf ]; then
   cp "${PWD}/.devcontainer/files/mariadb/.my.cnf" ~/.my.cnf
-fi
-
-if [ ! -e ~/.myclirc ]; then
-  cp "${PWD}/.devcontainer/files/mycli/.myclirc" ~/.myclirc
 fi
 
 if [ ! -e "${PWD}/.bundle/config" ]; then
@@ -47,15 +42,19 @@ if [ ! -e "${PWD}/.bundle/config" ]; then
 fi
 
 if [ ! -e "${PWD}/config/configuration.yml" ]; then
-  cp "${PWD}/.devcontainer/files/redmine/configuration.yml" "${PWD}/config/configuration.yml"
+  cp "${PWD}/.devcontainer/files/redmine/config/configuration.yml" "${PWD}/config/configuration.yml"
 fi
 
 if [ ! -e "${PWD}/config/database.yml" ]; then
-  cp "${PWD}/.devcontainer/files/redmine/database.yml" "${PWD}/config/database.yml"
+  cp "${PWD}/.devcontainer/files/redmine/config/database.yml" "${PWD}/config/database.yml"
 fi
 
 if [ ! -e "${PWD}/Gemfile.local" ]; then
   cp "${PWD}/.devcontainer/files/redmine/Gemfile.local" "${PWD}/Gemfile.local"
+fi
+
+if [ -e "${PWD}/.devcontainer/files/redmine/config/additional_environment.rb" ] && [ ! -e "${PWD}/config/additional_environment.rb" ]; then
+  cp "${PWD}/.devcontainer/files/redmine/config/additional_environment.rb" "${PWD}/config/additional_environment.rb"
 fi
 
 bundle install
@@ -67,3 +66,11 @@ fi
 bundle exec rake db:migrate 
 bundle exec rake redmine:plugins:migrate 
 
+if [ ! -e "${HOME}/.local/bin/ansible" ]; then
+  pipx install ansible --include-deps
+fi
+
+if [ -e "${PWD}/.devcontainer/scripts/post_create.yml" ]; then
+  cd "${PWD}/.devcontainer/scripts" || exit 1
+  ansible-playbook post_create.yml -i 127.0.0.1, -c local
+fi
