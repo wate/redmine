@@ -2,25 +2,4 @@
   hosts: all
   become: false
   gather_facts: false
-  tasks:
-    - name: Install mycli
-      community.general.pipx:
-        name: mycli
-        state: install
-        executable: pipx
-    - name: Install MkDocs
-      community.general.pipx:
-        name: mkdocs-material
-        # install_deps: true
-        state: install
-        executable: pipx
-    - name: Install MkDocs inject packages
-      community.general.pipx:
-        name: mkdocs-material
-        state: inject
-        executable: pipx
-        inject_packages:
-          - mkdocs-git-revision-date-localized-plugin
-          - mkdocs-glightbox
-          - mkdocs-section-index
-          - mkdocs-literate-nav
+  tasks: []
