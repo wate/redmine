@@ -1,0 +1,6 @@
+---
+- name: mycliのインストール
+  community.general.pipx:
+    name: mycli
+    state: install
+    install_deps: true

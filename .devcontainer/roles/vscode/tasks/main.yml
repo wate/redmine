@@ -1,0 +1,48 @@
+---
+- name: VSCodeの設定ディレクトリを作成
+  ansible.builtin.file:
+    path: "{{ playbook_dir | dirname }}/.vscode"
+    state: directory
+    mode: "0755"
+- name: タスクリスト変数を初期化
+  ansible.builtin.set_fact:
+    vscode_tasks:
+      - label: Start Rails server
+        type: shell
+        command: bundle exec rails server -p 3000 -b 0.0.0.0
+        detail: Start Rails server
+      - label: Install gem packages
+        type: shell
+        command: bundle install
+        detail: Install gem packages
+      - label: Update gem packages
+        type: shell
+        command: bundle update
+        detail: Update gem packages
+- name: Rakeタスクの一覧を取得
+  ansible.builtin.command:
+    cmd: bundle exec rake -T
+    chdir: "{{ playbook_dir | dirname }}"
+  changed_when: false
+  register: cmd_result
+- name: タスクリスト変数にRakeタスクを追加
+  ansible.builtin.set_fact:
+    vscode_tasks: "{{ vscode_tasks + [rake_task] }}"
+  vars:
+    rake_task:
+      label: "{{ (item.split('# ')[0] | trim)[5:] }}"
+      type: shell
+      command: "bundle exec {{ item.split('# ')[0] | trim }}"
+      detail: "{{ item.split('# ')[1] | trim }}"
+  loop: "{{ cmd_result.stdout_lines }}"
+  loop_control:
+    label: "{{ item.split('# ')[0] | trim }}"
+- name: タスクファイルを生成
+  ansible.builtin.template:
+    src: tasks.json.j2
+    dest: "{{ playbook_dir | dirname }}/.vscode/tasks.json"
+    mode: "0644"
+  vars:
+    vscode_task_file_var:
+      version: "2.0.0"
+      tasks: "{{ vscode_tasks }}"
