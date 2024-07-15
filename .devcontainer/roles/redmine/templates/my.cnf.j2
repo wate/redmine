@@ -1,0 +1,9 @@
+[mysql]
+auto-rehash
+
+[client]
+database={{ redmine_database[redmine_environment].database }}
+user={{ redmine_database[redmine_environment].username }}
+password={{ redmine_database[redmine_environment].password }}
+host=mariadb
+default-character-set=utf8mb4
