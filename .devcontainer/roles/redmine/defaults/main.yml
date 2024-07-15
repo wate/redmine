@@ -1,5 +1,6 @@
 ---
-redmine_environment: development
+redmine_env: development
+
 redmine_plugins: []
 redmine_themes: []
 
