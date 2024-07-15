@@ -3,6 +3,7 @@
   become: false
   gather_facts: false
   roles:
+    - role: lde
     - role: redmine
     - role: vscode
   tasks: []

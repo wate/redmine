@@ -17,6 +17,6 @@
     - rails
 - name: .inputrcのコピー
   ansible.builtin.copy:
-    src: .inputrc
+    src: inputrc
     dest: ~/.inputrc
     mode: "0644"
