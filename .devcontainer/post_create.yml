@@ -2,4 +2,7 @@
   hosts: all
   become: false
   gather_facts: false
+  roles:
+    - role: redmine
+    - role: vscode
   tasks: []

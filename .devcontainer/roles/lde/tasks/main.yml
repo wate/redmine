@@ -1,0 +1,16 @@
+---
+- name: オートコンプリートファイルのインストール
+  ansible.builtin.import_tasks:
+    file: completion.yml
+- name: git prompt for bashのインストール
+  ansible.builtin.import_tasks:
+    file: git_prompt_for_bash.yml
+- name: mycliのセットアップ
+  ansible.builtin.import_tasks:
+    file: mycli.yml
+- name: MkDocsのセットアップ
+  ansible.builtin.import_tasks:
+    file: mkdocs.yml
+- name: その他設定
+  ansible.builtin.import_tasks:
+    file: other.yml

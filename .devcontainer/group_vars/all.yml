@@ -1,0 +1,20 @@
+---
+redmine_admin:
+  first_name:
+  last_name:
+  email:
+  passowrd:
+
+redmine_plugins: {}
+redmine_themes: {}
+
+redmine_group: {}
+redmine_users: {}
+redmine_roles: {}
+redmine_workflows: {}
+
+redmine_user_custom_fiels: {}
+redmine_project_custom_fiels: {}
+redmine_issue_custom_fiels: {}
+
+redmine_projects: {}
