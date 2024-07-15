@@ -44,11 +44,20 @@
     creates: "{{ playbook_dir | dirname }}/config/initializers/secret_token.rb"
     chdir: "{{ playbook_dir | dirname }}"
   register: generate_secret_token_result
-- name: データベースのマイグレーションを実行(本体)
-  ansible.builtin.command:
-    cmd: bundle exec rake db:migrate
-    chdir: "{{ playbook_dir | dirname }}"
-- name: データベースのマイグレーションを実行(プラグイン)
-  ansible.builtin.command:
-    cmd: bundle exec rake redmine:plugins:migrate
-    chdir: "{{ playbook_dir | dirname }}"
+- name: direnvの設定ファイルを作成
+  ansible.builtin.blockinfile:
+    path: "{{ playbook_dir | dirname }}/.envrc"
+    content: export RAILS_ENV={{ redmine_env }}
+    mode: "0644"
+- name: データベースのマイグレーションを実行
+  environment:
+    RAILS_ENV: "{{ redmine_env }}"
+  block:
+    - name: データベースのマイグレーションを実行(本体)
+      ansible.builtin.command:
+        cmd: bundle exec rake db:migrate
+        chdir: "{{ playbook_dir | dirname }}"
+    - name: データベースのマイグレーションを実行(プラグイン)
+      ansible.builtin.command:
+        cmd: bundle exec rake redmine:plugins:migrate
+        chdir: "{{ playbook_dir | dirname }}"
