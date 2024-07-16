@@ -44,11 +44,13 @@
     creates: "{{ playbook_dir | dirname }}/config/initializers/secret_token.rb"
     chdir: "{{ playbook_dir | dirname }}"
   register: generate_secret_token_result
-- name: direnvの設定ファイルを作成
+- name: 動作モードの環境変数を設定
   ansible.builtin.blockinfile:
     path: "{{ playbook_dir | dirname }}/.envrc"
+    marker: "# {mark} rails ANSIBLE MANAGED BLOCK"
     content: export RAILS_ENV={{ redmine_env }}
     mode: "0644"
+    create: true
 - name: データベースのマイグレーションを実行
   environment:
     RAILS_ENV: "{{ redmine_env }}"
