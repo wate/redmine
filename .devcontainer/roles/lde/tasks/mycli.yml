@@ -4,3 +4,8 @@
     name: mycli
     state: install
     install_deps: true
+- name: mycliの設定ファイルをコピー
+  ansible.builtin.copy:
+    src: myclirc
+    dest: ~/.myclirc
+    mode: "0644"
