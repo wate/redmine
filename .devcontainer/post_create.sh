@@ -12,3 +12,5 @@ if [ -e "${PWD}/.devcontainer/post_create.yml" ]; then
   cd "${PWD}/.devcontainer" || exit 1
   ansible-playbook post_create.yml -i localhost, -c local
 fi
+
+source ~/.bashrc

@@ -1,0 +1,6 @@
+---
+- name: フォント格納用ディレクトリを作成
+  ansible.builtin.file:
+    path: "{{ document_asset_font_dir }}"
+    state: directory
+    mode: "0755"

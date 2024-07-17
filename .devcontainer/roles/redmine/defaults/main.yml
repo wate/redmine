@@ -4,6 +4,30 @@ redmine_env: development
 redmine_plugins: []
 redmine_themes: []
 
+redmine_bundler_cfg:
+  # BUNDLE_PATH: "~/vendor/bundle"
+  BUNDLE_DISABLE_SHARED_GEMS: "true"
+  BUNDLE_RETRY: 3
+
+redmine_additional_environment: |
+  config.paths['app/views'] = ['views', 'app/views']
+
+redmine_gemfile_local: |
+  gem 'ruby-lsp'
+  gem 'rails-erd'
+
+redmine_lang: ja
+
+redmine_cfg:
+  default:
+    email_delivery:
+      delivery_method: :smtp
+      smtp_settings:
+        address: "localhost"
+        port: 1025
+
+redmine_skip_load_default_fata: false
+
 redmine_database:
   development:
     adapter: mysql2

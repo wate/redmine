@@ -1,65 +1,93 @@
 ---
 - name: bundlerの設定ファイル格納ディレクトリを作成
   ansible.builtin.file:
-    path: "{{ playbook_dir | dirname }}/.bundle"
+    path: "{{ base_dir }}/.bundle"
     state: directory
     mode: "0755"
-- name: bundlerの設定ファイルをコピー
-  ansible.builtin.copy:
-    src: bundler/config
-    dest: "{{ playbook_dir | dirname }}/.bundle/config"
-    mode: "0644"
-- name: 追加でインストールするgemパッケージの定義ファイルをコピー
-  ansible.builtin.copy:
-    src: Gemfile.local
-    dest: "{{ playbook_dir | dirname }}/Gemfile.local"
-    mode: "0644"
-- name: Redmineのデータベース接続設定ファイルを作成
+- name: bundlerの設定ファイルを生成
   ansible.builtin.template:
-    src: database.yml.j2
-    dest: "{{ playbook_dir | dirname }}/config/database.yml"
+    src: bundle/config.j2
+    dest: "{{ base_dir }}/.bundle/confug"
+    mode: "0644"
+- name: Gemfile.localを生成
+  ansible.builtin.blockinfile:
+    path: "{{ base_dir }}/Gemfile.local"
+    content: "{{ redmine_gemfile_local }}"
+    mode: "0644"
+    create: true
+- name: Redmineのデータベース接続設定ファイルを生成
+  ansible.builtin.template:
+    src: config/database.yml.j2
+    dest: "{{ base_dir }}/config/database.yml"
     mode: "0644"
 - name: データベースの接続設定ファイルを生成
   ansible.builtin.template:
     src: my.cnf.j2
     dest: ~/.my.cnf
     mode: "0644"
-- name: Redmineの設定ファイルをコピー
-  ansible.builtin.copy:
-    src: config/configuration.yml
-    dest: "{{ playbook_dir | dirname }}/config/configuration.yml"
+- name: Redmineのデータベース接続設定ファイルを生成
+  ansible.builtin.template:
+    src: config/database.yml.j2
+    dest: "{{ base_dir }}/config/database.yml"
+    mode: "0644"
+- name: Redmineの設定ファイルのサンプルを読み込み
+  ansible.builtin.command:
+    cmd: cat {{ base_dir }}/config/configuration.yml.example
+  register: cat_result
+  changed_when: false
+- name: Redmineの設定ファイル用変数を初期化
+  ansible.builtin.set_fact:
+    redmine_configuration: "{{ cat_result.stdout | from_yaml }}"
+- name: Redmineの個別設定を設定ファイル用変数に結合
+  ansible.builtin.set_fact:
+    redmine_configuration: "{{ redmine_configuration | combine(redmine_cfg, recursive=true) }}"
+- name: Redmineの設定ファイルを生成
+  ansible.builtin.template:
+    src: config/configuration.yml.j2
+    dest: "{{ base_dir }}/config/configuration.yml"
     mode: "0644"
 - name: 追加の環境設定ファイルをコピー
-  ansible.builtin.copy:
-    src: config/additional_environment.rb
-    dest: "{{ playbook_dir | dirname }}/config/additional_environment.rb"
+  ansible.builtin.blockinfile:
+    path: "{{ base_dir }}/config/additional_environment.rb"
+    content: "{{ redmine_additional_environment }}"
     mode: "0644"
+    create: true
 - name: gemパッケージのインストール
   ansible.builtin.command:
     cmd: bundle install
-    chdir: "{{ playbook_dir | dirname }}"
+    chdir: "{{ base_dir }}"
 - name: トークンファイル生成コマンドを実行
   ansible.builtin.command:
     cmd: bundle exec rake generate_secret_token
-    creates: "{{ playbook_dir | dirname }}/config/initializers/secret_token.rb"
-    chdir: "{{ playbook_dir | dirname }}"
+    creates: "{{ base_dir }}/config/initializers/secret_token.rb"
+    chdir: "{{ base_dir }}"
   register: generate_secret_token_result
 - name: 動作モードの環境変数を設定
   ansible.builtin.blockinfile:
-    path: "{{ playbook_dir | dirname }}/.envrc"
+    path: "{{ base_dir }}/.envrc"
     marker: "# {mark} rails ANSIBLE MANAGED BLOCK"
-    content: export RAILS_ENV={{ redmine_env }}
+    content: |
+      export RAILS_ENV={{ redmine_env }}
+      export REDINE_LANG={{ redmine_lang }}
     mode: "0644"
     create: true
 - name: データベースのマイグレーションを実行
   environment:
     RAILS_ENV: "{{ redmine_env }}"
+    REDMINE_LANG: "{{ redmine_lang }}"
   block:
     - name: データベースのマイグレーションを実行(本体)
       ansible.builtin.command:
         cmd: bundle exec rake db:migrate
-        chdir: "{{ playbook_dir | dirname }}"
+        chdir: "{{ base_dir }}"
     - name: データベースのマイグレーションを実行(プラグイン)
       ansible.builtin.command:
         cmd: bundle exec rake redmine:plugins:migrate
-        chdir: "{{ playbook_dir | dirname }}"
+        chdir: "{{ base_dir }}"
+    - name: 初期データの登録
+      ansible.builtin.command:
+        cmd: bundle exec rake redmine:load_default_data
+        chdir: "{{ base_dir }}"
+      when:
+        - generate_secret_token_result is changed
+        - not redmine_skip_load_default_fata
