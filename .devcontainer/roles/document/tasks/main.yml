@@ -1,15 +1,22 @@
 ---
 - name: ドキュメントディレクトリを作成
   ansible.builtin.file:
-    path: "{{ document_base_dir }}"
+    path: "{{ item }}"
     state: directory
     mode: "0755"
-- name: Import font task
-  ansible.builtin.import_tasks:
-    file: font.yml
+  loop:
+    - "{{ document_base_dir }}"
+    - "{{ document_asset_dir }}"
+    - "{{ document_asset_image_dir }}"
+    - "{{ document_asset_font_dir }}"
+    - "{{ document_asset_css_dir }}"
+    - "{{ document_asset_js_dir }}"
 - name: Import webfont task
   ansible.builtin.import_tasks:
     file: webfont.yml
 - name: Import database document task
   ansible.builtin.import_tasks:
     file: database.yml
+- name: Import er diagram document task
+  ansible.builtin.import_tasks:
+    file: erd.yml
