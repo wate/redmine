@@ -7,3 +7,9 @@ document_asset_image_dir: "{{ document_asset_dir }}/images"
 document_asset_font_dir: "{{ document_asset_dir }}/fonts"
 document_asset_css_dir: "{{ document_asset_dir }}/stylesheets"
 document_asset_js_dir: "{{ document_asset_dir }}/javascripts"
+
+## @see https://voormedia.github.io/rails-erd/customise.html
+document_erd_cfg:
+  title: Redmine domain model
+  filename: doc/assets/images/erd
+  filetype: svg
