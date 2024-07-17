@@ -35,16 +35,11 @@ RUN mkdir -p /etc/apt/keyrings \
   && apt update \
   && apt install -y eza
 
-## Install git-delta
-RUN curl -fsSL https://github.com/dandavison/delta/releases/download/0.17.0/git-delta_0.17.0_amd64.deb -o git-delta_amd64.deb \
-  && dpkg -i git-delta_amd64.deb \
-  && rm -f git-delta_amd64.deb
+## Install d2
+RUN curl -fsSL https://d2lang.com/install.sh | sh -s --
 
 ## Install tbls
 COPY --from=tbls /usr/bin/tbls /usr/local/bin/tbls
 
 ## Install runn
 COPY --from=runn /usr/bin/runn /usr/local/bin/runn
-
-## Install d2
-RUN curl -fsSL https://d2lang.com/install.sh | sh -s --

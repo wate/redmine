@@ -11,6 +11,22 @@
 - name: MkDocsのセットアップ
   ansible.builtin.import_tasks:
     file: mkdocs.yml
-- name: その他設定
+- name: direnvの設定
   ansible.builtin.import_tasks:
-    file: other.yml
+    file: direnv.yml
+- name: eza設定
+  ansible.builtin.import_tasks:
+    file: eza.yml
+- name: editorconfigの設定
+  ansible.builtin.import_tasks:
+    file: editorconfig.yml
+- name: git-deltaのインストール
+  ansible.builtin.import_tasks:
+    file: git_delta.yml
+  become: true
+  when: lde_install_git_delta
+- name: pandocのインストール
+  ansible.builtin.import_tasks:
+    file: pandoc.yml
+  become: true
+  when: lde_install_pandoc
