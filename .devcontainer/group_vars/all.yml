@@ -1,4 +1,6 @@
 ---
+base_dir: "{{ playbook_dir | dirname }}"
+
 redmine_admin:
   first_name:
   last_name:

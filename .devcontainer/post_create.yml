@@ -4,6 +4,9 @@
   gather_facts: false
   roles:
     - role: lde
+    - role: font
+      become: true
     - role: redmine
+    - role: document
     - role: vscode
   tasks: []

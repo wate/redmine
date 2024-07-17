@@ -4,21 +4,6 @@
     path: "{{ playbook_dir | dirname }}/.vscode"
     state: directory
     mode: "0755"
-- name: タスクリスト変数を初期化
-  ansible.builtin.set_fact:
-    vscode_tasks:
-      - label: Start Rails server
-        type: shell
-        command: bundle exec rails server -p 3000 -b 0.0.0.0
-      - label: Install gem packages
-        type: shell
-        command: bundle install
-      - label: Update gem packages
-        type: shell
-        command: bundle update
-      - label: Sync local repository from remote parent
-        type: shell
-        command: gh repo sync
 - name: Rakeタスクの一覧を取得
   ansible.builtin.command:
     cmd: bundle exec rake -T
@@ -42,7 +27,3 @@
     src: tasks.json.j2
     dest: "{{ playbook_dir | dirname }}/.vscode/tasks.json"
     mode: "0644"
-  vars:
-    vscode_task_file_var:
-      version: "2.0.0"
-      tasks: "{{ vscode_tasks }}"

@@ -1,0 +1,9 @@
+---
+document_base_dir: "{{ base_dir | default(playbook_dir | dirname) }}/doc"
+document_schema_dir: "{{ document_base_dir }}/schema"
+
+document_asset_dir: "{{ document_base_dir }}/assets"
+document_asset_image_dir: "{{ document_asset_dir }}/images"
+document_asset_font_dir: "{{ document_asset_dir }}/fonts"
+document_asset_css_dir: "{{ document_asset_dir }}/stylesheets"
+document_asset_js_dir: "{{ document_asset_dir }}/javascripts"
