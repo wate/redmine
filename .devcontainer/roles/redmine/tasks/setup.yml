@@ -71,7 +71,12 @@
       export REDINE_LANG={{ redmine_lang }}
     mode: "0644"
     create: true
+- name: スキーマファイルの存在確認
+  ansible.builtin.stat:
+    path: "{{ base_dir }}/db/schema.rb"
+  register: schema_result
 - name: データベースのマイグレーションを実行
+  when: not schema_result.stat.exists
   environment:
     RAILS_ENV: "{{ redmine_env }}"
     REDMINE_LANG: "{{ redmine_lang }}"

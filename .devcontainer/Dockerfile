@@ -1,5 +1,4 @@
-FROM k1low/tbls:latest AS tbls
-FROM ghcr.io/k1low/runn:latest AS runn
+
 FROM buildpack-deps:bookworm
 
 RUN . /etc/os-release \
@@ -34,12 +33,3 @@ RUN mkdir -p /etc/apt/keyrings \
   && chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list \
   && apt update \
   && apt install -y eza
-
-## Install d2
-RUN curl -fsSL https://d2lang.com/install.sh | sh -s --
-
-## Install tbls
-COPY --from=tbls /usr/bin/tbls /usr/local/bin/tbls
-
-## Install runn
-COPY --from=runn /usr/bin/runn /usr/local/bin/runn

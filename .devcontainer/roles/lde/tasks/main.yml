@@ -1,4 +1,20 @@
 ---
+- name: マシン情報を取得
+  ansible.builtin.setup:
+    gather_subset:
+      - system
+      - architecture
+      - os_family
+      - distribution
+      - distribution_major_version
+      - distribution_release
+      - distribution_version
+  become: true
+- name: GPG鍵保存用ディレクトリを作成
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+  become: true
 - name: オートコンプリートファイルのインストール
   ansible.builtin.import_tasks:
     file: completion.yml
@@ -24,9 +40,23 @@
   ansible.builtin.import_tasks:
     file: git_delta.yml
   become: true
-  when: lde_install_git_delta
+  when: git_delta_install
+- name: tblsのインストール
+  ansible.builtin.import_tasks:
+    file: tbls.yml
+  become: true
+- name: runnのインストール
+  ansible.builtin.import_tasks:
+    file: runn.yml
+  become: true
+  when: runn_install
+- name: d2のインストール
+  ansible.builtin.import_tasks:
+    file: d2.yml
+  become: true
+  when: d2_install
 - name: pandocのインストール
   ansible.builtin.import_tasks:
     file: pandoc.yml
   become: true
-  when: lde_install_pandoc
+  when: pandoc_install
