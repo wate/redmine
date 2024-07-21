@@ -17,6 +17,12 @@
 - name: Import database document task
   ansible.builtin.import_tasks:
     file: database.yml
-- name: Import er diagram document task
+- name: Import ER diagram document task
   ansible.builtin.import_tasks:
     file: erd.yml
+- name: Import API document task
+  ansible.builtin.import_tasks:
+    file: api.yml
+- name: Import MkDocs task
+  ansible.builtin.import_tasks:
+    file: mkdocs.yml

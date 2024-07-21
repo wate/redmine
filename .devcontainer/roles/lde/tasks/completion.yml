@@ -15,8 +15,3 @@
     - bundle
     - rake
     - rails
-- name: .inputrcのコピー
-  ansible.builtin.copy:
-    src: inputrc
-    dest: ~/.inputrc
-    mode: "0644"

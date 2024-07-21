@@ -10,6 +10,111 @@ document_asset_js_dir: "{{ document_asset_dir }}/javascripts"
 
 ## @see https://voormedia.github.io/rails-erd/customise.html
 document_erd_cfg:
-  title: Redmine domain model
-  filename: doc/assets/images/erd
+  title: Domain model
+  filename: "{{ document_asset_image_dir | relpath(base_dir) }}/erd"
   filetype: svg
+
+document_css_output_license_text: |
+  "白源/HackGen" are licensed under SIL OPEN FONT LICENSE Version 1.1.
+  https://github.com/yuru7/HackGen
+  "Bizin Gothic" are licensed under SIL OPEN FONT LICENSE Version 1.1.
+  https://github.com/yuru7/bizin-gothic
+
+### Webフォント化するフォントファイルの出力ファイル名のプレフィックス
+document_webfont_file_prefix: CodeFont
+
+### Webフォント化するファイルの一覧
+document_webfont_files:
+  ## HackGen
+  - src: /usr/local/share/fonts/HackGen/HackGen-Regular.ttf
+    output_file: "{{ document_webfont_file_prefix }}H-Regular.ttf"
+    css:
+      comment: "Original: HackGen"
+      family: "{{ document_webfont_file_prefix }}H"
+  - src: /usr/local/share/fonts/HackGen/HackGen-Bold.ttf
+    output_file: "{{ document_webfont_file_prefix }}H-Bold.ttf"
+    css:
+      comment: "Original: HackGen"
+      family: "{{ document_webfont_file_prefix }}H"
+      weight: bold
+  ## Bizin Gothic
+  - src: /usr/local/share/fonts/BizinGothic/BizinGothic-Regular.ttf
+    output_file: "{{ document_webfont_file_prefix }}B-Regular.ttf"
+    css:
+      comment: "Original: BizinGothic"
+      family: "{{ document_webfont_file_prefix }}B"
+  - src: /usr/local/share/fonts/BizinGothic/BizinGothic-Bold.ttf
+    output_file: "{{ document_webfont_file_prefix }}B-Bold.ttf"
+    css:
+      comment: "Original: BizinGothic"
+      family: "{{ document_webfont_file_prefix }}B"
+      weight: bold
+  ## Bizin Gothic Discord
+  - src: /usr/local/share/fonts/BizinGothicDiscord/BizinGothicDiscord-Regular.ttf
+    output_file: "{{ document_webfont_file_prefix }}BD-Regular.ttf"
+    css:
+      comment: "Original: Bizin Gothic Discord"
+      family: "{{ document_webfont_file_prefix }}BD"
+  - src: /usr/local/share/fonts/BizinGothicDiscord/BizinGothicDiscord-Bold.ttf
+    output_file: "{{ document_webfont_file_prefix }}BD-Bold.ttf"
+    css:
+      comment: "Original: Bizin Gothic Discord"
+      family: "{{ document_webfont_file_prefix }}BD"
+      weight: bold
+  ## UDEV Gothic
+  # - src: /usr/local/share/fonts/UDEVGothic/UDEVGothic-Regular.ttf
+  #   output_file: "{{ document_webfont_file_prefix }}U-Regular.ttf"
+  #   css:
+  #     comment: "Original: UDEV Gothic"
+  #     family: "{{ document_webfont_file_prefix }}U"
+  # - src: /usr/local/share/fonts/UDEVGothic/UDEVGothic-Italic.ttf
+  #   output_file: "{{ document_webfont_file_prefix }}U-Italic.ttf"
+  #   css:
+  #     comment: "Original: UDEV Gothic"
+  #     family: "{{ document_webfont_file_prefix }}U"
+  #     style: italic
+  # - src: /usr/local/share/fonts/UDEVGothic/UDEVGothic-Bold.ttf
+  #   output_file: "{{ document_webfont_file_prefix }}U-Bold.ttf"
+  #   css:
+  #     comment: "Original: UDEV Gothic"
+  #     family: "{{ document_webfont_file_prefix }}U"
+  #     weight: bold
+  # - src: /usr/local/share/fonts/UDEVGothic/UDEVGothic-BoldItalic.ttf
+  #   output_file: "{{ document_webfont_file_prefix }}U-BoldItalic.ttf"
+  #   css:
+  #     comment: "Original: UDEV Gothic"
+  #     family: "{{ document_webfont_file_prefix }}U"
+  #     style: italic
+  #     weight: bold
+  # - src: /usr/local/share/fonts/UDEVGothic/UDEVGothic35-Regular.ttf
+  #   output_file: "{{ document_webfont_file_prefix }}U35-Regular.ttf"
+  #   css:
+  #     comment: "Original: UDEV Gothic35"
+  #     family: "{{ document_webfont_file_prefix }}U35"
+  # - src: /usr/local/share/fonts/UDEVGothic/UDEVGothic35-Italic.ttf
+  #   output_file: "{{ document_webfont_file_prefix }}U35-Italic.ttf"
+  #   css:
+  #     comment: "Original: UDEV Gothic35"
+  #     family: "{{ document_webfont_file_prefix }}U35"
+  #     style: italic
+  # - src: /usr/local/share/fonts/UDEVGothic/UDEVGothic35-Bold.ttf
+  #   output_file: "{{ document_webfont_file_prefix }}U35-Bold.ttf"
+  #   css:
+  #     comment: "Original: UDEV Gothic35"
+  #     family: "{{ document_webfont_file_prefix }}U35"
+  #     weight: bold
+  # - src: /usr/local/share/fonts/UDEVGothic/UDEVGothic35-BoldItalic.ttf
+  #   output_file: "{{ document_webfont_file_prefix }}U35-BoldItalic.ttf"
+  #   css:
+  #     comment: "Original: UDEV Gothic35"
+  #     family: "{{ document_webfont_file_prefix }}U35"
+  #     style: italic
+  #     weight: bold
+
+
+## CSS出力時の初期値
+document_webfont_css_default:
+  style: normal
+  weight: normal
+  display: swap
+
