@@ -9,12 +9,6 @@
     src: bundle/config.j2
     dest: "{{ base_dir }}/.bundle/confug"
     mode: "0644"
-- name: Gemfile.localを生成
-  ansible.builtin.blockinfile:
-    path: "{{ base_dir }}/Gemfile.local"
-    content: "{{ redmine_gemfile_local }}"
-    mode: "0644"
-    create: true
 - name: Redmineのデータベース接続設定ファイルを生成
   ansible.builtin.template:
     src: config/database.yml.j2
@@ -46,13 +40,19 @@
     src: config/configuration.yml.j2
     dest: "{{ base_dir }}/config/configuration.yml"
     mode: "0644"
+- name: Gemfile.localを生成
+  ansible.builtin.blockinfile:
+    path: "{{ base_dir }}/Gemfile.local"
+    content: "{{ redmine_gemfile_local }}"
+    mode: "0644"
+    create: true
 - name: 追加の環境設定ファイルをコピー
   ansible.builtin.blockinfile:
     path: "{{ base_dir }}/config/additional_environment.rb"
     content: "{{ redmine_additional_environment }}"
     mode: "0644"
     create: true
-- name: gemパッケージのインストール
+- name: 依存パッケージのインストール
   ansible.builtin.command:
     cmd: bundle install
     chdir: "{{ base_dir }}"

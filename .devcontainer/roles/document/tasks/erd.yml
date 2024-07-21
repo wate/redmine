@@ -12,3 +12,7 @@
     cmd: bundle exec rake erd
     chdir: "{{ base_dir }}"
   when: erd_config_update_result is changed
+- name: ERDのドキュメントファイルを生成
+  ansible.builtin.template:
+    src: erd.md.j2
+    dest: "{{ document_base_dir }}/erd.md"

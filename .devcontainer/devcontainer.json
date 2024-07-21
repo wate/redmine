@@ -4,7 +4,6 @@
 	"dockerComposeFile": "compose.yml",
 	"service": "redmine",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
 		"ghcr.io/devcontainers/features/common-utils:2": {
 			"installZsh": false,
@@ -17,30 +16,13 @@
 			// "userGid": "automatic",
 			// "nonFreePackages": false
 		},
-		// "ghcr.io/devcontainers-contrib/features/ansible:2": {
-		// 	"version": "latest"
-		// },
-		// "ghcr.io/hspaans/devcontainer-features/ansible-lint:1": {
-		// 	"version": "latest"
-		// },
-		// "ghcr.io/devcontainers-contrib/features/mkdocs:2": {
-		// 	"version": "latest",
-		// 	"plugins": [
-		// 		"mkdocs-material",
-		// 		"mkdocs-glightbox",
-		// 		"mkdocs-git-revision-date-localized-plugin",
-		// 		"mkdocs-section-index",
-		// 		"mkdocs-literate-nav"
-		// 	]
-		// }
 	},
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// This can be used to network with other containers or the host.
+  "remoteEnv": {
+    "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
+  },
 	"forwardPorts": [3000, 8025],
-	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "/usr/bin/bash .devcontainer/post_create.sh",
 	"postStartCommand": "/usr/bin/bash .devcontainer/post_start.sh",
-	// Configure tool-specific properties.
 	"customizations": {
 		"vscode": {
 			"extensions": [
