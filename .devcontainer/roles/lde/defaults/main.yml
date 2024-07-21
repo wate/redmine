@@ -1,3 +1,14 @@
 ---
-lde_install_git_delta: true
-lde_install_pandoc: true
+tbls_version: latest
+
+runn_install: true
+runn_version: latest
+
+git_delta_install: true
+git_delta_version: latest
+
+d2_install: true
+d2_version: latest
+
+pandoc_install: true
+pandoc_version: latest
