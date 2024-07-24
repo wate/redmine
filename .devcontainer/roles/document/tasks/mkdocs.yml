@@ -1,12 +1,25 @@
-- name: ナビゲーション用ファイルを生成
-  ansible.builtin.template:
-    src: SUMMARY.md.j2
-    dest: "{{ document_base_dir }}/SUMMARY.md"
-- name: ドキュメントのインデックスファイルを生成
-  ansible.builtin.template:
-    src: index.md.j2
+---
+- name: インデックスファイルの存在確認
+  ansible.builtin.stat:
+    path: "{{ document_base_dir }}/index.md"
+  register: document_index_result
+- name: インデックスファイルを生成
+  ansible.builtin.copy:
+    src: files/mkdocs/index.md
     dest: "{{ document_base_dir }}/index.md"
-- name: カスタマイズ用CSSファイルが存在するか確認
+    mode: "0644"
+  when: document_index_result.stat.exists
+- name: ナビゲーションファイルの存在確認
+  ansible.builtin.stat:
+    path: "{{ document_base_dir }}/SUMMARY.md"
+  register: document_nav_result
+- name: ナビゲーションファイルをコピー
+  ansible.builtin.copy:
+    src: files/mkdocs/SUMMARY.md
+    dest: "{{ document_base_dir }}/SUMMARY.md"
+    mode: "0644"
+  when: document_nav_result.stat.exists
+- name: カスタマイズ用CSSファイルの存在確認
   ansible.builtin.stat:
     path: "{{ document_asset_css_dir }}/extra.css"
   register: extra_css_result
@@ -15,8 +28,8 @@
     src: files/mkdocs/extra.css
     dest: "{{ document_asset_css_dir }}/extra.css"
     mode: "0644"
-  when: extra_css_result.stat.exists
-- name: カスタマイズ用JSファイルが存在するか確認
+  when: not extra_css_result.stat.exists
+- name: カスタマイズ用JSファイルの存在確認
   ansible.builtin.stat:
     path: "{{ document_asset_js_dir }}/extra.js"
   register: extra_js_result
@@ -25,4 +38,4 @@
     src: files/mkdocs/extra.js
     dest: "{{ document_asset_js_dir }}/extra.js"
     mode: "0644"
-  when: extra_js_result.stat.exists
+  when: not extra_js_result.stat.exists
