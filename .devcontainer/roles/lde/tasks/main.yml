@@ -39,11 +39,6 @@
 - name: editorconfigの設定
   ansible.builtin.import_tasks:
     file: editorconfig.yml
-- name: git-deltaのインストール
-  ansible.builtin.import_tasks:
-    file: git_delta.yml
-  become: true
-  when: git_delta_install
 - name: tblsのインストール
   ansible.builtin.import_tasks:
     file: tbls.yml
@@ -63,3 +58,13 @@
     file: pandoc.yml
   become: true
   when: pandoc_install
+- name: git-deltaのインストール
+  ansible.builtin.import_tasks:
+    file: git_delta.yml
+  become: true
+  when: git_delta_install
+- name: PICTのインストール
+  ansible.builtin.import_tasks:
+    file: pict.yml
+  become: true
+  when: pict_install

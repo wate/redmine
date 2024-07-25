@@ -12,3 +12,5 @@ d2_version: latest
 
 pandoc_install: true
 pandoc_version: latest
+
+pict_install: true
