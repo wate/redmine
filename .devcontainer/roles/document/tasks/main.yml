@@ -1,5 +1,5 @@
 ---
-- name: ドキュメントディレクトリを作成
+- name: Create document directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -20,6 +20,12 @@
 - name: Import ER diagram document task
   ansible.builtin.import_tasks:
     file: erd.yml
+- name: Import routing document task
+  ansible.builtin.import_tasks:
+    file: routes.yml
+- name: Import Rake task document task
+  ansible.builtin.import_tasks:
+    file: rake_task.yml
 - name: Import API document task
   ansible.builtin.import_tasks:
     file: api.yml

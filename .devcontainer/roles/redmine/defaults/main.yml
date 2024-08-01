@@ -1,5 +1,6 @@
 ---
-redmine_env: development
+redmine_rails_env: development
+redmine_lang: ja
 
 redmine_plugins: []
 redmine_themes: []
@@ -17,8 +18,6 @@ redmine_gemfile_local: |
   gem 'ruby-lsp'
   gem 'ruby-lsp-rails'
 
-redmine_lang: ja
-
 redmine_cfg:
   default:
     email_delivery:
@@ -27,7 +26,7 @@ redmine_cfg:
         address: "localhost"
         port: 1025
 
-redmine_skip_load_default_fata: false
+redmine_skip_load_default_data: false
 
 redmine_database:
   development:

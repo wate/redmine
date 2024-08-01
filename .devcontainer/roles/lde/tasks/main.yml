@@ -21,6 +21,9 @@
 - name: gitの無視ファイルの設定を調整
   ansible.builtin.import_tasks:
     file: git.yml
+- name: gemの設定を調整
+  ansible.builtin.import_tasks:
+    file: gem.yml
 - name: git prompt for bashのインストール
   ansible.builtin.import_tasks:
     file: git_prompt_for_bash.yml
