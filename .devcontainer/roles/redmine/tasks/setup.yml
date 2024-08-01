@@ -7,7 +7,7 @@
 - name: bundlerの設定ファイルを生成
   ansible.builtin.template:
     src: bundle/config.j2
-    dest: "{{ base_dir }}/.bundle/confug"
+    dest: "{{ base_dir }}/.bundle/config"
     mode: "0644"
 - name: Redmineのデータベース接続設定ファイルを生成
   ansible.builtin.template:
@@ -67,7 +67,7 @@
     path: "{{ base_dir }}/.envrc"
     marker: "# {mark} rails ANSIBLE MANAGED BLOCK"
     content: |
-      export RAILS_ENV={{ redmine_env }}
+      export RAILS_ENV={{ redmine_rails_env }}
       export REDINE_LANG={{ redmine_lang }}
     mode: "0644"
     create: true
@@ -78,7 +78,7 @@
 - name: データベースのマイグレーションを実行
   when: not schema_result.stat.exists
   environment:
-    RAILS_ENV: "{{ redmine_env }}"
+    RAILS_ENV: "{{ redmine_rails_env }}"
     REDMINE_LANG: "{{ redmine_lang }}"
   block:
     - name: データベースのマイグレーションを実行(本体)
@@ -95,4 +95,4 @@
         chdir: "{{ base_dir }}"
       when:
         - generate_secret_token_result is changed
-        - not redmine_skip_load_default_fata
+        - not redmine_skip_load_default_data

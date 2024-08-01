@@ -14,7 +14,7 @@
 - name: サブセットフォント用のテキストファイルを生成
   ansible.builtin.template:
     src: subset_all.txt.j2
-    dest: "{{ document_asset_font_dir }}/subset.txt"
+    dest: "{{ document_subset_font_text_file_path }}"
     mode: "0644"
   vars:
     subset_text_files:
@@ -29,7 +29,7 @@
   ansible.builtin.command:
     cmd: >
       fonttools subset
-      --text-file={{ document_asset_font_dir }}/subset.txt
+      --text-file={{ document_subset_font_text_file_path }}
       --output-file={{ item.output_file | default(item.src | basename) }}
       {{ item.src }}
     chdir: "{{ document_asset_font_dir }}"

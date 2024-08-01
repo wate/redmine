@@ -39,7 +39,16 @@
 			"settings": {
 				"ansible.python.interpreterPath": "/usr/bin/python3",
 				"ansible.ansible.path": "/home/vscode/.local/bin/ansible",
-				"ansible.validation.lint.path": "/home/vscode/.local/bin/ansible-lint"
+				"ansible.validation.lint.path": "/home/vscode/.local/bin/ansible-lint",
+        "rubyLsp.indexing": {
+          "excludedPatterns": [
+            "**/test/**.rb"
+          ],
+          "includedPatterns": [
+            "**/bin/**",
+            "**/tasks/**.rake"
+          ]
+        }
 			}
 		},
 	},

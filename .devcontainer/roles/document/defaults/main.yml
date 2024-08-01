@@ -14,6 +14,10 @@ document_erd_cfg:
   filename: "{{ document_asset_image_dir | relpath(base_dir) }}/erd"
   filetype: svg
 
+### サブセットフォントに含める文字のテキストファイル保存先
+document_subset_font_text_file_path: "{{ document_asset_font_dir }}/subset.txt"
+
+### CSSファイルの冒頭に出力するライセンス用テキスト
 document_css_output_license_text: |
   "白源/HackGen" are licensed under SIL OPEN FONT LICENSE Version 1.1.
   https://github.com/yuru7/HackGen
@@ -22,6 +26,12 @@ document_css_output_license_text: |
 
 ### Webフォント化するフォントファイルの出力ファイル名のプレフィックス
 document_webfont_file_prefix: CodeFont
+
+## CSS出力時の初期値
+document_webfont_css_default:
+  style: normal
+  weight: normal
+  display: swap
 
 ### Webフォント化するファイルの一覧
 document_webfont_files:
@@ -110,11 +120,3 @@ document_webfont_files:
   #     family: "{{ document_webfont_file_prefix }}U35"
   #     style: italic
   #     weight: bold
-
-
-## CSS出力時の初期値
-document_webfont_css_default:
-  style: normal
-  weight: normal
-  display: swap
-
