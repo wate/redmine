@@ -29,13 +29,14 @@ services:
     restart: unless-stopped
     environment:
       TZ: Asia/tokyo
+      MP_ENABLE_SPAMASSASSIN: postmark
     ports:
       - "8025:8025"
-  redis:
-    image: redis:latest
-    restart: unless-stopped
-    volumes:
-      - redis-data:/data
+  # redis:
+  #   image: redis:latest
+  #   restart: unless-stopped
+  #   volumes:
+  #     - redis-data:/data
   # memcached:
   #   image: memcached:latest
   #   restart: unless-stopped
