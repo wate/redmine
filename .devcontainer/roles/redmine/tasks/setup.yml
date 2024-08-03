@@ -77,7 +77,7 @@
   block:
     - name: データベースのマイグレーションを実行
       ansible.builtin.command:
-        cmd: bundle install
+        cmd: bundle exec rake db:migrate
         chdir: "{{ base_dir }}"
     - name: 初期データの登録
       ansible.builtin.command:
