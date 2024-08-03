@@ -1,23 +1,13 @@
 ---
-- name: bundlerの設定ファイル格納ディレクトリを作成
+- name: Bundlerの設定ファイル格納ディレクトリを作成
   ansible.builtin.file:
     path: "{{ base_dir }}/.bundle"
     state: directory
     mode: "0755"
-- name: bundlerの設定ファイルを生成
+- name: Bundlerの設定ファイルを生成
   ansible.builtin.template:
     src: bundle/config.j2
     dest: "{{ base_dir }}/.bundle/config"
-    mode: "0644"
-- name: Redmineのデータベース接続設定ファイルを生成
-  ansible.builtin.template:
-    src: config/database.yml.j2
-    dest: "{{ base_dir }}/config/database.yml"
-    mode: "0644"
-- name: データベースの接続設定ファイルを生成
-  ansible.builtin.template:
-    src: my.cnf.j2
-    dest: ~/.my.cnf
     mode: "0644"
 - name: Redmineのデータベース接続設定ファイルを生成
   ansible.builtin.template:
@@ -52,7 +42,7 @@
     content: "{{ redmine_additional_environment }}"
     mode: "0644"
     create: true
-- name: 依存パッケージのインストール
+- name: gemパッケージのインストール
   ansible.builtin.command:
     cmd: bundle install
     chdir: "{{ base_dir }}"
@@ -65,29 +55,29 @@
 - name: 動作モードの環境変数を設定
   ansible.builtin.blockinfile:
     path: "{{ base_dir }}/.envrc"
-    marker: "# {mark} rails ANSIBLE MANAGED BLOCK"
+    marker: "# {mark} dotenv extra ANSIBLE MANAGED BLOCK"
+    content: |
+      PATH_add bin
+      source_env_if_exists .env
+    mode: "0644"
+    create: true
+- name: 動作モードの環境変数を設定
+  ansible.builtin.blockinfile:
+    path: "{{ base_dir }}/.envrc"
+    marker: "# {mark} redmine ANSIBLE MANAGED BLOCK"
     content: |
       export RAILS_ENV={{ redmine_rails_env }}
       export REDINE_LANG={{ redmine_lang }}
     mode: "0644"
     create: true
-- name: スキーマファイルの存在確認
-  ansible.builtin.stat:
-    path: "{{ base_dir }}/db/schema.rb"
-  register: schema_result
-- name: データベースのマイグレーションを実行
-  when: not schema_result.stat.exists
+- name: データベースのマイグレーションと初期データのロード
   environment:
     RAILS_ENV: "{{ redmine_rails_env }}"
     REDMINE_LANG: "{{ redmine_lang }}"
   block:
-    - name: データベースのマイグレーションを実行(本体)
+    - name: データベースのマイグレーションを実行
       ansible.builtin.command:
-        cmd: bundle exec rake db:migrate
-        chdir: "{{ base_dir }}"
-    - name: データベースのマイグレーションを実行(プラグイン)
-      ansible.builtin.command:
-        cmd: bundle exec rake redmine:plugins:migrate
+        cmd: bundle install
         chdir: "{{ base_dir }}"
     - name: 初期データの登録
       ansible.builtin.command:

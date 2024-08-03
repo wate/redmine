@@ -1,23 +1,40 @@
 ---
+## 動作モード
 redmine_rails_env: development
+
+## 言語
 redmine_lang: ja
 
-redmine_plugins: []
-redmine_themes: []
+## プラグイン
+redmine_plugins:
+  view_customize:
+    repo: https://github.com/onozaty/redmine-view-customize.git
+    version: master
 
+## テーマ
+redmine_themes: {}
+#   PurpleMine2:
+#     repo: https://github.com/mrliptontea/PurpleMine2.git
+#     version: master
+
+## Bundlerの設定
 redmine_bundler_cfg:
   # BUNDLE_PATH: "~/vendor/bundle"
   BUNDLE_DISABLE_SHARED_GEMS: "true"
   BUNDLE_RETRY: 3
+  # BUNDLE_WITHOUT: development:test
 
-redmine_additional_environment: |
-  config.paths['app/views'] = ['views', 'app/views']
-
+## 追加でインストールするgemパッケージ
 redmine_gemfile_local: |
   gem 'rails-erd'
   gem 'ruby-lsp'
   gem 'ruby-lsp-rails'
 
+## Redmineの追加環境設定
+redmine_additional_environment: |
+  config.paths['app/views'] = ['views', 'app/views']
+
+## Redmineの設定
 redmine_cfg:
   default:
     email_delivery:
@@ -26,8 +43,10 @@ redmine_cfg:
         address: "localhost"
         port: 1025
 
+## 初期データの読み込みをスキップするか否か
 redmine_skip_load_default_data: false
 
+## データベースの接続設定
 redmine_database:
   development:
     adapter: mysql2

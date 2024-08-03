@@ -14,17 +14,18 @@
   ansible.builtin.file:
     path: /etc/apt/keyrings
     state: directory
+    mode: "0755"
   become: true
 - name: オートコンプリートファイルのインストール
   ansible.builtin.import_tasks:
     file: completion.yml
-- name: gitの無視ファイルの設定を調整
+- name: Gitの無視ファイルの設定を調整
   ansible.builtin.import_tasks:
     file: git.yml
-- name: gemの設定を調整
+- name: Gemの設定を調整
   ansible.builtin.import_tasks:
     file: gem.yml
-- name: git prompt for bashのインストール
+- name: Git prompt for bashのインストール
   ansible.builtin.import_tasks:
     file: git_prompt_for_bash.yml
 - name: mycliのセットアップ
@@ -39,7 +40,7 @@
 - name: eza設定
   ansible.builtin.import_tasks:
     file: eza.yml
-- name: editorconfigの設定
+- name: Editorconfigの設定
   ansible.builtin.import_tasks:
     file: editorconfig.yml
 - name: tblsのインストール
@@ -51,17 +52,17 @@
     file: runn.yml
   become: true
   when: runn_install
-- name: d2のインストール
+- name: D2のインストール
   ansible.builtin.import_tasks:
     file: d2.yml
   become: true
   when: d2_install
-- name: pandocのインストール
+- name: Pandocのインストール
   ansible.builtin.import_tasks:
     file: pandoc.yml
   become: true
   when: pandoc_install
-- name: git-deltaのインストール
+- name: Git-deltaのインストール
   ansible.builtin.import_tasks:
     file: git_delta.yml
   become: true
