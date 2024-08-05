@@ -4,6 +4,7 @@
     path: "{{ base_dir }}/.gitignore"
     content: |
       /.editorconfig
+      /.env
       /.envrc
       /.erdconfig
       /.vscode/
@@ -11,6 +12,7 @@
       /doc/app/
       /doc/assets/
       /doc/schema/
+      /doc/*.md
   register: gitignore_result
 - name: .gitignoreの変更を無視するように設定
   ansible.builtin.command:

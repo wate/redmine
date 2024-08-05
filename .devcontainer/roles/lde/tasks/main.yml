@@ -28,6 +28,9 @@
 - name: Git prompt for bashのインストール
   ansible.builtin.import_tasks:
     file: git_prompt_for_bash.yml
+- name: MariaDBのセットアップ
+  ansible.builtin.import_tasks:
+    file: mariadb.yml
 - name: mycliのセットアップ
   ansible.builtin.import_tasks:
     file: mycli.yml
