@@ -1,0 +1,85 @@
+- name: Execute post start task
+  hosts: all
+  become: false
+  gather_facts: false
+  tasks:
+    - name: 実行中のマシン情報を取得
+      ansible.builtin.setup:
+        gather_subset:
+          - system
+      become: true
+    - name: データベースをクリア
+      when: ansible_facts.system == 'Linux'
+      block:
+        - name: データベースを削除
+          ansible.builtin.command:
+            cmd: bundle exec rake db:drop
+            chdir: "{{ base_dir }}"
+        - name: データベースを作成
+          ansible.builtin.command:
+            cmd: bundle exec rake db:create
+            chdir: "{{ base_dir }}"
+    - name: インストール済みのテーマを抽出
+      ansible.builtin.find:
+        paths:
+          - "{{ base_dir }}/themes"
+          - "{{ base_dir }}/public/themes"
+        file_type: directory
+      register: installed_theme_result
+    - name: インストール済みのテーマを削除
+      ansible.builtin.file:
+        path: "{{ installed_theme.path }}"
+        state: absent
+      loop: "{{ installed_theme_result.files }}"
+      loop_control:
+        loop_var: installed_theme
+        label: "{{ installed_theme.path | basename }}"
+    - name: インストール済みのプラグインを抽出
+      ansible.builtin.find:
+        paths:
+          - "{{ base_dir }}/plugins/"
+        file_type: directory
+      register: installed_plugin_result
+    - name: インストール済みプラグインを削除
+      ansible.builtin.file:
+        path: "{{ installed_plugin.path }}"
+        state: absent
+      loop: "{{ installed_plugin_result.files }}"
+      loop_control:
+        loop_var: installed_plugin
+        label: "{{ installed_plugin.path | basename }}"
+    - name: Redmineの設定ファイルを削除
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ base_dir }}/.editorconfig"
+        - "{{ base_dir }}/.env"
+        - "{{ base_dir }}/.envrc"
+        - "{{ base_dir }}/.erdconfig"
+        - "{{ base_dir }}/Gemfile.local"
+        - "{{ base_dir }}/Gemfile.lock"
+        - "{{ base_dir }}/.yardoc"
+        - "{{ base_dir }}/.bundle"
+        - "{{ base_dir }}/config/additional_environment.rb"
+        - "{{ base_dir }}/config/configuration.yml"
+        - "{{ base_dir }}/config/database.yml"
+        - "{{ base_dir }}/config/initializers/secret_token.rb"
+        - "{{ base_dir }}/db/schema.rb"
+    - name: 自動生成した各種ドキュメントを削除
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ base_dir }}/doc/index.md"
+        - "{{ base_dir }}/doc/SUMMARY.md"
+        - "{{ base_dir }}/doc/erd.md"
+        - "{{ base_dir }}/doc/rake_task.md"
+        - "{{ base_dir }}/doc/routes.md"
+        - "{{ base_dir }}/doc/app"
+        - "{{ base_dir }}/doc/assets"
+        - "{{ base_dir }}/doc/schema"
+    - name: VSCodeの設定を削除
+      ansible.builtin.file:
+        path: "{{ base_dir }}/.vscode"
+        state: absent

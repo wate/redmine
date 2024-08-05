@@ -15,6 +15,11 @@ font_packages:
   # - fonts-noto-mono
   # - fonts-noto-color-emoji
 
+## -----------------
+## プログラミングフォントを強制インストールをするか否か
+## -----------------
+font_programming_font_force_install: false
+
 font_hackgen_version: latest
 font_plemoljp_version: latest
 font_udevgothic_version: latest

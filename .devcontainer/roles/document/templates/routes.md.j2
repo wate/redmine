@@ -12,8 +12,8 @@
 {% set col_uri_pattern_pad_width = col_uri_pattern_width - ('URI Pattern' | length) %}
 {% set col_controller_action_pad_width = col_controller_action_width - ('Controller#Action' | length) %}
 
-| HTTP Method{{ ' ' * col_verb_pad_width }} | URI Pattern{{ ' ' * col_uri_pattern_pad_width }} | Controller#Action{{ ' ' * col_controller_action_pad_width }} |
-|:{{ '-' * col_verb_width }}:| {{ '-' * col_uri_pattern_width }} | {{ '-' * col_controller_action_width }} |
+| HTTP Method{{ ' ' * col_verb_pad_width }} | URI Pattern{{ ' ' * col_uri_pattern_pad_width }} | Controller#Action{{ ' ' * col_controller_action_pad_width }} | Prefix{{ ' ' * col_prefix_width }} |
+|:{{ '-' * col_verb_width }}:| {{ '-' * col_uri_pattern_width }} | {{ '-' * col_controller_action_width }} | {{ '-' * col_prefix_width }} |
 {% for route in redmine_routes[1:] %}
 {% set route_prefix = route[0:col_verd_index] | trim %}
 {% set route_verb = route[col_verd_index:col_uri_pattern_index] | replace('|', '/') | trim %}
@@ -23,5 +23,5 @@
 {% set verb_pad_width = col_verb_width - (route_verb | length) %}
 {% set uri_pattern_pad_width = col_uri_pattern_width - (route_uri_pattern | length) - 2 %}
 {% set controller_action_pad_width = col_controller_action_width - (route_controller_action | length) - 2 %}
-| {{ route_verb }}{{ ' ' * verb_pad_width }} | `{{ route_uri_pattern }}`{{ ' ' * uri_pattern_pad_width }} | `{{ route_controller_action }}`{{ ' ' * controller_action_pad_width }} |
+| {{ route_verb }}{{ ' ' * verb_pad_width }} | `{{ route_uri_pattern }}`{{ ' ' * uri_pattern_pad_width }} | `{{ route_controller_action }}`{{ ' ' * controller_action_pad_width }} | {{ route_prefix }}{{ ' ' * prefix_pad_width }} |
 {% endfor %}

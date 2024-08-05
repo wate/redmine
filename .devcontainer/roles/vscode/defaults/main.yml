@@ -9,9 +9,14 @@ vscode_tasks:
   - label: Update gem packages
     type: shell
     command: bundle update
+  - label: Reset local develop environment
+    type: shell
+    command: |
+      rm -fr .yard
+      rm -fr .vscode
   - label: Sync local repository from remote parent
     type: shell
     command: gh repo sync
-  - label: generate Database schme
+  - label: Generate database document
     type: shell
     command: tbls doc --rm-dist -j -c .tbls.yml

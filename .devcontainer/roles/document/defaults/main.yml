@@ -17,6 +17,9 @@ document_erd_cfg:
 ### サブセットフォントに含める文字のテキストファイル保存先
 document_subset_font_text_file_path: "{{ document_asset_font_dir }}/subset.txt"
 
+### Webフォントファイルの強制更新
+document_force_update_web_font: false
+
 ### CSSファイルの冒頭に出力するライセンス用テキスト
 document_css_output_license_text: |
   "白源/HackGen" are licensed under SIL OPEN FONT LICENSE Version 1.1.

@@ -6,10 +6,10 @@ redmine_rails_env: development
 redmine_lang: ja
 
 ## プラグイン
-redmine_plugins:
-  view_customize:
-    repo: https://github.com/onozaty/redmine-view-customize.git
-    version: master
+redmine_plugins: {}
+#   view_customize:
+#     repo: https://github.com/onozaty/redmine-view-customize.git
+#     version: master
 
 ## テーマ
 redmine_themes: {}
