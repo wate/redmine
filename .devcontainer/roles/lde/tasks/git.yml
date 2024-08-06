@@ -3,12 +3,14 @@
   ansible.builtin.blockinfile:
     path: "{{ base_dir }}/.gitignore"
     content: |
+      /.devcontainer/host_vars/localhost.yml
       /.editorconfig
       /.env
       /.envrc
       /.erdconfig
       /.vscode/
       /.yardoc/
+      /bin/import.rb
       /doc/app/
       /doc/assets/
       /doc/schema/

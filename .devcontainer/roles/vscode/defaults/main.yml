@@ -3,20 +3,6 @@ vscode_tasks:
   - label: Start Rails server
     type: shell
     command: bundle exec rails server -p 3000 -b 0.0.0.0
-  - label: Install gem packages
+  - label: Import setting
     type: shell
-    command: bundle install
-  - label: Update gem packages
-    type: shell
-    command: bundle update
-  - label: Reset local develop environment
-    type: shell
-    command: |
-      rm -fr .yard
-      rm -fr .vscode
-  - label: Sync local repository from remote parent
-    type: shell
-    command: gh repo sync
-  - label: Generate database document
-    type: shell
-    command: tbls doc --rm-dist -j -c .tbls.yml
+    command: IMPORT_AFTER_NO_DELETE=1 bundle exec rails runner bin/import.rb

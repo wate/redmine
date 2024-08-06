@@ -1,0 +1,9 @@
+---
+- name: Copy recommendations extension file
+  ansible.builtin.copy:
+    src: extensions.json
+    dest: "{{ playbook_dir | dirname }}/.vscode/extensions.json"
+- name: Include extention setting tasks
+  ansible.builtin.include_tasks:
+    file: "{{ item }}"
+  loop: "{{ lookup('ansible.builtin.fileglob', 'extention/*.yml', wantlist=True) }}"

@@ -10,6 +10,9 @@ redmine_plugins: {}
 #   view_customize:
 #     repo: https://github.com/onozaty/redmine-view-customize.git
 #     version: master
+#   redmine_issue_templates:
+#     repo: https://github.com/agileware-jp/redmine_issue_templates.git
+#     version: master
 
 ## テーマ
 redmine_themes: {}
