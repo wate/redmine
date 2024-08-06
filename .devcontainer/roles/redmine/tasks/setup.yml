@@ -1,22 +1,22 @@
 ---
 - name: Bundlerの設定ファイル格納ディレクトリを作成
   ansible.builtin.file:
-    path: "{{ base_dir }}/.bundle"
+    path: "{{ redmine_root }}/.bundle"
     state: directory
     mode: "0755"
 - name: Bundlerの設定ファイルを生成
   ansible.builtin.template:
     src: bundle/config.j2
-    dest: "{{ base_dir }}/.bundle/config"
+    dest: "{{ redmine_root }}/.bundle/config"
     mode: "0644"
 - name: Redmineのデータベース接続設定ファイルを生成
   ansible.builtin.template:
     src: config/database.yml.j2
-    dest: "{{ base_dir }}/config/database.yml"
+    dest: "{{ redmine_root }}/config/database.yml"
     mode: "0644"
 - name: Redmineの設定ファイルのサンプルを読み込み
   ansible.builtin.command:
-    cmd: cat {{ base_dir }}/config/configuration.yml.example
+    cmd: cat {{ redmine_root }}/config/configuration.yml.example
   register: cat_result
   changed_when: false
 - name: Redmineの設定ファイル用変数を初期化
@@ -28,33 +28,33 @@
 - name: Redmineの設定ファイルを生成
   ansible.builtin.template:
     src: config/configuration.yml.j2
-    dest: "{{ base_dir }}/config/configuration.yml"
+    dest: "{{ redmine_root }}/config/configuration.yml"
     mode: "0644"
 - name: Gemfile.localを生成
   ansible.builtin.blockinfile:
-    path: "{{ base_dir }}/Gemfile.local"
+    path: "{{ redmine_root }}/Gemfile.local"
     content: "{{ redmine_gemfile_local }}"
     mode: "0644"
     create: true
 - name: 追加の環境設定ファイルをコピー
   ansible.builtin.blockinfile:
-    path: "{{ base_dir }}/config/additional_environment.rb"
+    path: "{{ redmine_root }}/config/additional_environment.rb"
     content: "{{ redmine_additional_environment }}"
     mode: "0644"
     create: true
 - name: gemパッケージのインストール
   ansible.builtin.command:
     cmd: bundle install
-    chdir: "{{ base_dir }}"
+    chdir: "{{ redmine_root }}"
 - name: トークンファイル生成コマンドを実行
   ansible.builtin.command:
     cmd: bundle exec rake generate_secret_token
-    creates: "{{ base_dir }}/config/initializers/secret_token.rb"
-    chdir: "{{ base_dir }}"
+    creates: "{{ redmine_config_dir }}/initializers/secret_token.rb"
+    chdir: "{{ redmine_root }}"
   register: generate_secret_token_result
 - name: 動作モードの環境変数を設定
   ansible.builtin.blockinfile:
-    path: "{{ base_dir }}/.envrc"
+    path: "{{ redmine_root }}/.envrc"
     marker: "# {mark} dotenv extra ANSIBLE MANAGED BLOCK"
     content: |
       PATH_add bin
@@ -63,7 +63,7 @@
     create: true
 - name: 動作モードの環境変数を設定
   ansible.builtin.blockinfile:
-    path: "{{ base_dir }}/.envrc"
+    path: "{{ redmine_root }}/.envrc"
     marker: "# {mark} redmine ANSIBLE MANAGED BLOCK"
     content: |
       export RAILS_ENV={{ redmine_rails_env }}
@@ -78,11 +78,11 @@
     - name: データベースのマイグレーションを実行
       ansible.builtin.command:
         cmd: bundle exec rake db:migrate
-        chdir: "{{ base_dir }}"
+        chdir: "{{ redmine_root }}"
     - name: 初期データの登録
       ansible.builtin.command:
         cmd: bundle exec rake redmine:load_default_data
-        chdir: "{{ base_dir }}"
+        chdir: "{{ redmine_root }}"
       when:
         - generate_secret_token_result is changed
         - not redmine_skip_load_default_data
