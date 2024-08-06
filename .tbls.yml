@@ -30,6 +30,7 @@ dict:
   Definition: 定義
   Table Definition: テーブル定義
   Extra Definition: 拡張定義
+  Viewpoints: ビューポイント
 exclude:
   - ar_internal_metadata
   - schema_migrations
@@ -774,3 +775,94 @@ relations:
   # changes
   - table: changes
     <<: *relation_changeset_id
+
+## ---------------
+## ビューポイント
+## ---------------
+# viewpoints:
+#   - name: プロジェクト関連テーブル
+#     desc: プロジェクト機能に関連するテーブルです
+#     tables:
+#       - projects
+#       - members
+#       - users
+#       - member_roles
+#       - roles
+#       - issues
+#       - trackers
+#       - issue_categories
+#       - versions
+#       - documents
+#       - enumerations
+#       - wikis
+#       - wiki_pages
+#       - wiki_contents
+#       - wiki_redirects
+#       - attachments
+#       - news
+#       - boards
+#       - messages
+#       - time_entries
+#       - repositories
+#       - changesets
+#       - changes
+#       - enabled_modules
+#       - projects_trackers
+#       - queries
+#     groups:
+#       - name: チケットトラッキング
+#         desc: チケットトラッキング機能に関連するテーブルです
+#         tables:
+#           - issues
+#           - trackers
+#           - issue_categories
+#           - versions
+#       - name: Wiki
+#         desc: Wiki機能に関連するテーブルです
+#         tables:
+#           - wikis
+#           - wiki_pages
+#           - wiki_contents
+#           - wiki_redirects
+#       - name: 時間管理
+#         desc: 時間管理機能に関連するテーブルです
+#         tables:
+#           - time_entries
+#       - name: ファイル
+#         desc: ファイル機能に関連するテーブルです
+#         tables:
+#           - attachments
+#       - name: 文書
+#         desc: 文書機能に関連するテーブルです
+#         tables:
+#           - documents
+#           - enumerations
+#       - name: ニュース
+#         desc: ニュース機能に関連するテーブルです
+#         tables:
+#           - news
+#       - name: フォーラム
+#         desc: フォーラム機能に関連するテーブルです
+#         tables:
+#           - boards
+#           - messages
+#       - name: リポジトリ
+#         desc: リポジトリ機能に関連するテーブルです
+#         tables:
+#           - repositories
+#           - changesets
+#           - changes
+#       - name: メンバー
+#         desc: プロジェクトのメンバーに関連するテーブルです
+#         tables:
+#           - members
+#           - users
+#           - member_roles
+#           - roles
+#       - name: その他
+#         desc: その他
+#         tables:
+#           - projects
+#           - enabled_modules
+#           - projects_trackers
+#           - queries
