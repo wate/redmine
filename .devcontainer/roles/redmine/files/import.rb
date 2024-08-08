@@ -32,7 +32,7 @@ class Import
       User.update!(1, data)
       puts User.find_by_id(1)
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## ステータスのインポート
@@ -55,7 +55,7 @@ class Import
         puts status
       end
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## トラッカーのインポート
@@ -65,18 +65,57 @@ class Import
     if trackers.present?
       puts "\nImport tracker\n-----------------------"
       default_issue_status = IssueStatus.first
-      # ワークフローのコピー元の指定がないトラッカーを登録
+      # ワークフローのコピー元の指定がないトラッカーから先に登録
       import_trackers = trackers.reject {|item| item['copy_workflow_from'].present? }
-      import_trackers.each do |tracker|
-        import_tracker tracker, default_issue_status
-      end
-      # ワークフローのコピー元の指定があるトラッカーを登録
-      import_trackers = trackers.select {|item| item['copy_workflow_from'].present? }
-      import_trackers.each do |tracker|
-        import_tracker tracker, default_issue_status
+      import_trackers.concat trackers.select {|item| item['copy_workflow_from'].present? }
+      import_trackers.each do |data|
+        if data['id'].present?
+          tracker = Tracker.find_by_id(data['id'])
+          tracker.name = data['name']
+        else
+          tracker = Tracker.find_by_name(data['name'])
+        end
+        unless tracker
+          tracker = Tracker.new
+          tracker.name = data['name']
+          tracker.core_fields = [
+            'assigned_to_id',
+            'category_id',
+            'fixed_version_id',
+            'parent_issue_id',
+            'start_date',
+            'due_date',
+            'estimated_hours',
+            'done_ratio',
+            'description'
+          ]
+        end
+        tracker.core_fields = data['enabled_standard_fields'] if data['enabled_standard_fields'].present?
+        tracker.description = data['description'] if data.key?('description')
+        tracker.default_status_id = default_issue_status.id
+        tracker.is_in_roadmap = !!data['is_in_roadmap'] if data.key?('is_in_roadmap')
+        if data['default_status'].present?
+          if data['default_status'].is_a?(Hash)
+            if data['default_status'].key?('id') && data['default_status'].id
+              issue_status = IssueStatus.find_by_id(data['default_status'].id)
+            else
+              issue_status = IssueStatus.find_by_name(data['default_status'].name)
+            end
+          else
+            issue_status = IssueStatus.find_by_name(data['default_status'])
+          end
+          tracker.default_status_id = issue_status.id
+        end
+        tracker.position = data['position'] if data['position'].present?
+        tracker.save!
+        if data['copy_workflow_from'].present?
+          copy_from = Tracker.find_by_name(data['copy_workflow_from'])
+          tracker.copy_workflow_rules(copy_from) if copy_from
+        end
+        puts tracker
       end
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## ロールのインポート
@@ -181,7 +220,7 @@ class Import
         puts role
       end
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## チケットの優先度のインポート
@@ -200,7 +239,7 @@ class Import
         import_enumeration priority, data
       end
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## 文書カテゴリのインポート
@@ -219,7 +258,7 @@ class Import
         import_enumeration document_category, data
       end
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## 作業分類のインポート
@@ -238,7 +277,7 @@ class Import
         import_enumeration time_entry_activity, data
       end
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## チケットカスタムフィールドのインポート
@@ -272,7 +311,7 @@ class Import
         import_custom_field cf, data
       end
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## ユーザーカスタムフィールドのインポート
@@ -289,7 +328,7 @@ class Import
         import_custom_field cf, data
       end
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## 設定のインポート
@@ -322,7 +361,7 @@ class Import
         puts plugin_setting
       end
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## ワークフローのインポート
@@ -361,7 +400,7 @@ class Import
         puts({'tracker' => trackers.pluck(:name), 'role' => roles.pluck(:name), 'transition' => transitions})
       end
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## フィールド権限のインポート
@@ -465,7 +504,7 @@ class Import
         puts({'tracker' => trackers.pluck(:name), 'role' => roles.pluck(:name), 'permission' => permissions})
       end
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## ユーザーのインポート
@@ -587,7 +626,7 @@ class Import
         puts user
       end
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## グループのインポート
@@ -612,30 +651,46 @@ class Import
         puts group
       end
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
-  ## カスタムクエリーのインポート
-  def issue_custom_query
-    data_file = File.join(TMP_DIR, 'issue_custom_query.yml')
+  ## チケットのカスタムクエリーのインポート
+  def issue_query
+    data_file = File.join(TMP_DIR, 'issue_query.yml')
     custom_queries = load_data data_file
     if custom_queries.present?
-      puts "\nImport issue custom field\n-----------------------"
+      puts "\nImport issue query\n-----------------------"
       custom_queries.each do |data|
+        project = nil
+        if data['project']
+          project = Project.find_by_identifier(data['project'])
+          project ||= Project.find_by_name(data['project'])
+        end
+        import_issue_query data, project, true
+      end
+    end
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
+  end
+
+  ## プロジェクトのカスタムクエリーのインポート
+  def project_query
+    data_file = File.join(TMP_DIR, 'project_query.yml')
+    project_queries = load_data data_file
+    if project_queries.present?
+      puts "\nImport project query\n-----------------------"
+      project_queries.each do |data|
         if data['id'].present?
-          custom_query = IssueQuery.find_by_id(data['id'])
+          project_query = ProjectQuery.find_by_id(data['id'])
         else
-          custom_query = IssueQuery.find_by_name_and_project_id(data['name'], nil)
+          project_query = ProjectQuery.find_by_name(data['name'])
         end
-        unless custom_query
-          custom_query = IssueQuery.new({name: data['name']})
-          # 表示：全てのユーザー
-          custom_query.visibility = 2
-          # 全プロジェクト向け
-          custom_query.project = nil
-          custom_query.user = User.current
+        unless project_query
+          project_query = ProjectQuery.new({name: data['name']})
+          project_query.visibility = 1
+          project_query.user = User.current
         end
-        custom_query.name = data['name']
+        project_query.name = data['name']
+        project_query.project = nil
         ## フィルター
         filter_fields = []
         filter_operators = {}
@@ -645,61 +700,48 @@ class Import
           field_filter_operator = value['operator'] || value['op']
           field_filter_value = value['values'] || []
           case key
-          when 'status'
-            field_name = 'status_id'
-            field_filter_value = IssueStatus.where(:name => field_filter_value).pluck(:id).map {|item| item.to_s }
-          when 'tracker'
-            field_name = 'tracker_id'
-            field_filter_value = Tracker.where(:name => field_filter_value).pluck(:id).map {|item| item.to_s }
-          when 'priority'
-            field_name = 'priority_id'
-            field_filter_value = IssuePriority.where(:name => field_filter_value).pluck(:id).map {|item| item.to_s }
-          when 'author'
-            field_name = 'author_id'
-            has_me = field_filter_value.include?('me')
+          when 'id'
+            field_name = 'id'
             field_filter_value = User.where(:login => field_filter_value).pluck(:id).map {|item| item.to_s }
-            field_filter_value.push 'me' if has_me
-          when 'assigned_to'
-            field_name = 'assigned_to_id'
-            has_me = field_filter_value.include?('me')
-            field_filter_value = User.where(:login => field_filter_value).pluck(:id).map {|item| item.to_s }
-            field_filter_value.push 'me' if has_me
+            field_filter_value.push 'mine' if field_filter_value.include?('mine')
+            field_filter_value.push 'bookmarks' if field_filter_value.include?('bookmarks')
           end
           filter_fields.push field_name
           filter_operators[field_name] = field_filter_operator
           filter_values[field_name] = field_filter_value
         end
         form_params = {
-          :c => [],
-          :sort => [
-            ['id', 'desc']
-          ]
+          :display_type => 'bord',
         }
         ## フィルター
         form_params[:fields] = filter_fields
         form_params[:operators] = filter_operators
         form_params[:values] = filter_values
-        ## 表示項目
-        if data.key?('columns') && data['columns'].present?
-          form_params[:c] = data['columns']
+        ## 説明
+        if data.key?('description') && data['description'].present?
+          form_params[:description] = data['description']
         end
-        ## 並び順
-        if data.key?('sort') && data['sort'].present?
-          form_params[:sort] = []
-          data['sort'].each do |sort|
-            form_params[:sort].push [sort['field'], sort['order']]
-          end
-        end
-        ## グループ条件
-        form_params[:group_by] = data['group_by'] if data.key?('group_by')
-        ## 合計
-        form_params[:t] = data['total'] if data.key?('total')
-        custom_query.build_from_params form_params
-        custom_query.save!
-        puts custom_query.name
+        ## 表示
+        form_params[:visibility] = !!data['visibility'] ? 1 : 0 if data.key?('visibility')
+        ## 表示形式
+        form_params[:display_type] = data['display_type'] if data.key?('display_type')
+        project_query.build_from_params form_params
+        ## @todo `Validation failed: Project cannot be blank`が発生
+        project_query.save!
+        puts project_query.name
       end
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
+  end
+
+  ## 作業時間のカスタムクエリーのインポート
+  def time_entry_query
+    data_file = File.join(TMP_DIR, 'time_entry_query.yml')
+    custom_queries = load_data data_file
+    if custom_queries.present?
+      puts "\nImport time entry query\n-----------------------"
+    end
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## プロジェクトのインポート
@@ -708,72 +750,11 @@ class Import
     projects = load_data data_file
     if projects.present?
       puts "\nImport project\n-----------------------"
-      projects.each do |data|
-        project = Project.find_by_identifier(data['identifier'])
-        unless project
-          project = Project.new
-          project.identifier = data['identifier']
-        end
-        # 名称
-        project.name = data['name']
-        # 説明
-        project.description = data['description'] if data.key?('description')
-        # ホームページ
-        project.homepage = data['homepage'] if data.key?('homepage')
-        # 公開
-        project.is_public = data['is_public'] if data.key?('is_public')
-        # モジュール
-        project.enabled_module_names = data['modules'] if data.key?('modules')
-        # トラッカー
-        if data.key?('trackers')
-          project.tracker_ids = Tracker.where(:name => data['trackers']).pluck(:id)
-        end
-        # カスタムフィールド
-        if data.key?('custom_fields')
-          custom_field_values = {}
-          data['custom_fields'].each do |custom_field|
-            if custom_field['id'].present?
-              cf = ProjectCustomField.find_by_id(custom_field['id'])
-            else
-              cf = ProjectCustomField.find_by_name(custom_field['name'])
-            end
-            custom_field_values[cf.id] = custom_field['value'] if cf
-          end
-          project.custom_field_values = custom_field_values
-        end
-        project.save!
-        if data.key?('members')
-          project.delete_all_members
-          data['members'].each do |member|
-            user = User.find_by_login(member['login'])
-            role_ids = Role.where(:name => member['role']).pluck(:id)
-            if user && role_ids.present?
-              project_member = Member.new(:project => project, :user_id => user.id)
-              project_member.role_ids = role_ids
-              project_member.save!
-            end
-          end
-        end
-        if data.key?('wiki_start_page')
-          project.wiki.start_page = data['wiki_start_page']
-          project.wiki.save!
-        end
-        if data.key?('wiki_pages')
-          import_project_wiki_pages(project, data['wiki_pages'])
-        end
+      projects.each do |identifier, data|
+        import_project identifier, data
       end
-      ## 各プロジェクトに親プロジェクトを設定
-      has_parent_projects = projects.select {|data| data['parent'].present? }
-      has_parent_projects.each do |data|
-        project = Project.find_by_identifier(data['identifier'])
-        if project
-          parent = Project.where("identifier = :parent OR name = :parent", {parent: data['parent']}).sorted.first
-          project.set_parent!(parent) if parent
-        end
-      end
-
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## 添付ファイルのインポート
@@ -803,28 +784,31 @@ class Import
         end
       end
     end
-    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
-  ## redmine_message_customizeの設定のインポート
+  ## メッセージカスタマイズの設定のインポート
   def message_customize
+    data_file = File.join(TMP_DIR, 'message_customize.yml')
     if Redmine::Plugin.installed? :redmine_message_customize
-      data_file = File.join(TMP_DIR, 'message_customize.yml')
-      setting = load_data data_file
-      if setting.present?
+      message_customize_setting = load_data data_file
+      if message_customize_setting.present?
         puts "\nImport redmine_message_customize setting\n-----------------------"
+        lang = ENV['REDMINE_LANG'] || 'ja'
+        setting = {}
+        setting[lang] = message_customize_setting
         plugin_setting = CustomMessageSetting.find_or_default
         plugin_setting.update_with_custom_messages_yaml(setting)
         puts setting
       end
-      FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
     end
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## view_customizeの設定のインポート
   def view_customize
+    data_file = File.join(TMP_DIR, 'view_customize.yml')
     if Redmine::Plugin.installed? :view_customize
-      data_file = File.join(TMP_DIR, 'view_customize.yml')
       settings = load_data data_file
       if settings.present?
         puts "\nImport view_customize settings\n-----------------------"
@@ -845,14 +829,14 @@ class Import
           puts view_customize
         end
       end
-      FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
     end
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## redmine_issue_templatesのチケットテンプレートのインポート
   def issue_template
+    data_file = File.join(TMP_DIR, 'issue_template.yml')
     if Redmine::Plugin.installed? :redmine_issue_templates
-      data_file = File.join(TMP_DIR, 'issue_template.yml')
       issue_templates = load_data data_file
       if issue_templates.present?
         puts "\nImport issue template settings\n-----------------------"
@@ -889,14 +873,14 @@ class Import
           puts template
         end
       end
-      FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
     end
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   ## redmine_issue_templatesのコメントテンプレートのインポート
   def note_template
+    data_file = File.join(TMP_DIR, 'note_template.yml')
     if Redmine::Plugin.installed? :redmine_issue_templates
-      data_file = File.join(TMP_DIR, 'note_template.yml')
       note_templates = load_data data_file
       if note_templates.present?
         puts "\nImport note template settings\n-----------------------"
@@ -932,8 +916,8 @@ class Import
           puts template
         end
       end
-      FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE']
     end
+    FileUtils.rm_f(data_file) unless ENV['IMPORT_AFTER_NO_DELETE_DATA_FILE']
   end
 
   private
@@ -955,54 +939,6 @@ class Import
     enumeration.position = data['position'] if data.key?('position')
     enumeration.save!
     puts enumeration
-  end
-
-  ## トラッカーのインポート
-  def import_tracker(data, default_issue_status)
-    if data['id'].present?
-      tracker = Tracker.find_by_id(data['id'])
-      tracker.name = data['name']
-    else
-      tracker = Tracker.find_by_name(data['name'])
-    end
-    unless tracker
-      tracker = Tracker.new
-      tracker.name = data['name']
-      tracker.core_fields = [
-        'assigned_to_id',
-        'category_id',
-        'fixed_version_id',
-        'parent_issue_id',
-        'start_date',
-        'due_date',
-        'estimated_hours',
-        'done_ratio',
-        'description'
-      ]
-    end
-    tracker.core_fields = data['enabled_standard_fields'] if data['enabled_standard_fields'].present?
-    tracker.description = data['description'] if data.key?('description')
-    tracker.default_status_id = default_issue_status.id
-    tracker.is_in_roadmap = !!data['is_in_roadmap'] if data.key?('is_in_roadmap')
-    if data['default_status'].present?
-      if data['default_status'].is_a?(Hash)
-        if data['default_status'].key?('id') && data['default_status'].id
-          issue_status = IssueStatus.find_by_id(data['default_status'].id)
-        else
-          issue_status = IssueStatus.find_by_name(data['default_status'].name)
-        end
-      else
-        issue_status = IssueStatus.find_by_name(data['default_status'])
-      end
-      tracker.default_status_id = issue_status.id
-    end
-    tracker.position = data['position'] if data['position'].present?
-    tracker.save!
-    if data['copy_workflow_from'].present?
-      copy_from = Tracker.find_by_name(data['copy_workflow_from'])
-      tracker.copy_workflow_rules(copy_from) if copy_from
-    end
-    puts tracker
   end
 
   ## カスタムフィールドのインポート
@@ -1155,22 +1091,184 @@ class Import
     puts cf.name
   end
 
-  ## Wikiページのインポート
-  def import_project_wiki_pages(project, wiki_pages)
-    wiki_pages.each do |wiki_page|
-      page = project.wiki.find_or_new_page(wiki_page['name'])
-      content = page.content || WikiContent.new(:page => page)
-      content.text = wiki_page['content']
-      content.author = User.current
-      page.save_with_content(content)
+  ## プロジェクトのインポート
+  def import_project(identifier, data, parent=nil)
+    project = Project.find_by_identifier(identifier)
+    project ||= Project.new({identifier: identifier})
+    # 名称
+    project.name = data['name'] || identifier
+    # 説明
+    project.description = data['description'] if data.key?('description')
+    # ホームページ
+    project.homepage = data['homepage'] if data.key?('homepage')
+    # 公開
+    project.is_public = data['is_public'] if data.key?('is_public')
+    # モジュール
+    # @todo モジュール割当を有効にするとプロジェクト登録時に`Validation failed: Enabled modules is invalid`が発生
+    # @todo モジュール割当を有効にするとプロジェクト更新時に`Failed to replace enabled_modules because one or more of the new records could not be saved.`が発生
+    # project.enabled_module_names = data['modules'] if data.key?('modules')
+    # メンバーを継承
+    project.inherit_members = !!data['inherit_members'] if data.key?('inherit_members')
+    # 親プロジェクト
+    project.parent_id = parent.id if parent
+    # トラッカー
+    if data.key?('trackers')
+      project.tracker_ids = Tracker.where(:name => data['trackers']).pluck(:id)
     end
+    # カスタムフィールド
+    if data.key?('custom_fields')
+      custom_field_values = {}
+      data['custom_fields'].each do |custom_field|
+        if custom_field['id'].present?
+          cf = ProjectCustomField.find_by_id(custom_field['id'])
+        else
+          cf = ProjectCustomField.find_by_name(custom_field['name'])
+        end
+        custom_field_values[cf.id] = custom_field['value'] if cf
+      end
+      project.custom_field_values = custom_field_values
+    end
+    project.save!
+    puts project
+    ## メンバー
+    if data.key?('members')
+      project.delete_all_members
+      data['members'].each do |member|
+        user = User.find_by_login(member['login'])
+        role_ids = Role.where(name: member['role']).pluck(:id)
+        if user && role_ids.present?
+          project_member = Member.new(:project => project, :user_id => user.id)
+          project_member.role_ids = role_ids
+          project_member.save!
+        end
+      end
+    end
+    if data.key?('wiki_pages') && data['wiki_pages'].present?
+      import_wiki_pages(project, data['wiki_pages'])
+      # @todo メインページを設定できるようにする必要あり
+    end
+    if data.key?('issue_queries') && data['issue_queries'].present?
+      data['issue_queries'].each do |issue_query|
+        import_issue_query(issue_query, project)
+      end
+    end
+    if data.key?('issue_queries') && data['time_entry_queries'].present?
+      data['time_entry_queries'].each do |time_entry_query|
+        import_time_entry_query(time_entry_query, project)
+      end
+    end
+    if data.key?('childlen') && data['childlen']
+      data['childlen'].each do |child_identifier, child_data|
+        import_project child_identifier, child_data, project
+      end
+    end
+  end
 
-    has_parent_wiki_pages = wiki_pages.select {|data| data['parent'].present? }
-    has_parent_wiki_pages.each do |wiki_page|
-      page = project.wiki.find_or_new_page(wiki_page['name'])
-      page.parent_title = wiki_page['parent']
-      page.save!
+  ## Wikiページのインポート
+  def import_wiki_pages(project, wiki_pages, parent=nil)
+    wiki_pages.each do |page_name, data|
+      wiki_page = project.wiki.find_or_new_page(page_name)
+      wiki_page.parent_title = parent.title if parent
+      content = wiki_page.content || WikiContent.new({page: wiki_page})
+      content.text ||= "#{page_name}\n----------------------------\n\n{{child_pages}}"
+      if data && data['content']
+        content.text = data['content']
+      end
+      content.author = User.current
+      wiki_page.save_with_content(content)
+      wiki_page.save!
+      if data && data.key?('childlen') && data['childlen']
+        import_wiki_pages project, data['childlen'], wiki_page
+      end
     end
+  end
+
+  ## チケットのカスタムクエリーのインポート
+  def import_issue_query(data, project=nil, name_output=false)
+    if data['id'].present?
+      issue_query = IssueQuery.find_by_id(data['id'])
+    else
+      project_id = project ? project.id : nil
+      issue_query = IssueQuery.find_by_name_and_project_id(data['name'], project_id)
+    end
+    unless custom_query
+      issue_query = IssueQuery.new({name: data['name']})
+      # 表示：全てのユーザー
+      issue_query.visibility = 2
+      # 全プロジェクト向け
+      issue_query.project = project
+      issue_query.user = User.current
+    end
+    ## 名前
+    issue_query.name = data['name']
+    ## フィルター
+    filter_fields = []
+    filter_operators = {}
+    filter_values = {}
+    data['filters'].each do |key, value|
+      field_name = key
+      field_filter_operator = value['operator'] || value['op']
+      field_filter_value = value['values'] || []
+      case key
+      when 'status'
+        field_name = 'status_id'
+        field_filter_value = IssueStatus.where(:name => field_filter_value).pluck(:id).map {|item| item.to_s }
+      when 'tracker'
+        field_name = 'tracker_id'
+        field_filter_value = Tracker.where(:name => field_filter_value).pluck(:id).map {|item| item.to_s }
+      when 'priority'
+        field_name = 'priority_id'
+        field_filter_value = IssuePriority.where(:name => field_filter_value).pluck(:id).map {|item| item.to_s }
+      when 'author'
+        field_name = 'author_id'
+        field_filter_value = User.where(:login => field_filter_value).pluck(:id).map {|item| item.to_s }
+        field_filter_value.push 'me' if field_filter_value.include?('me')
+      when 'assigned_to'
+        field_name = 'assigned_to_id'
+        field_filter_value = User.where(:login => field_filter_value).pluck(:id).map {|item| item.to_s }
+        field_filter_value.push 'me' if field_filter_value.include?('me')
+      end
+      filter_fields.push field_name
+      filter_operators[field_name] = field_filter_operator
+      filter_values[field_name] = field_filter_value
+    end
+    form_params = {
+      :c => [],
+      :sort => [
+        ['id', 'desc']
+      ]
+    }
+    ## フィルター
+    form_params[:fields] = filter_fields
+    form_params[:operators] = filter_operators
+    form_params[:values] = filter_values
+    ## 説明
+    if data.key?('description') && data['columns'].present?
+      form_params[:description] = data['description']
+    end
+    ## 表示項目
+    if data.key?('columns') && data['columns'].present?
+      form_params[:c] = data['columns']
+    end
+    ## 並び順
+    if data.key?('sort') && data['sort'].present?
+      form_params[:sort] = []
+      data['sort'].each do |sort|
+        form_params[:sort].push [sort['field'], sort['order']]
+      end
+    end
+    ## グループ条件
+    form_params[:group_by] = data['group_by'] if data.key?('group_by')
+    ## 合計
+    form_params[:t] = data['total'] if data.key?('total')
+    issue_query.build_from_params form_params
+    issue_query.save!
+    puts issue_query.name if name_output
+  end
+
+  ## 時間管理のカスタムクエリーのインポート
+  def import_time_entry_query(data, project=nil)
+    puts '時間管理のカスタムクエリーのインポートはまだ未実装'
   end
 end
 
@@ -1211,9 +1309,13 @@ import.user
 ## グループをインポート
 import.group
 
-## カスタムクエリをインポート
-import.issue_custom_query
-## カスタムクエリのをインポート
+## チケットのカスタムクエリをインポート
+import.issue_query
+## プロジェクトのカスタムクエリをインポート
+import.project_query
+## 作業時間のカスタムクエリをインポート
+import.time_entry_query
+## プロジェクトをインポート
 import.project
 ## 添付ファイルをインポート
 import.attachment

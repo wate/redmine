@@ -202,19 +202,45 @@
         redmine_reimport_all | default(false)
         or
         redmine_reimport_group | default(false)
-    - name: Create import custom query setting files
+    - name: Create import issue query setting files
       ansible.builtin.template:
         src: import_data.yml.j2
-        dest: "{{ redmine_tmp_dir }}/issue_custom_query.yml"
+        dest: "{{ redmine_tmp_dir }}/issue_query.yml"
         mode: "0640"
       vars:
-        redmine_import_data: "{{ redmine_issue_custom_queries | default([]) }}"
+        redmine_import_data: "{{ redmine_issue_queries | default([]) }}"
       when: >
         generate_secret_token_result is changed
         or
         redmine_reimport_all | default(false)
         or
-        redmine_reimport_issue_custom_query | default(false)
+        redmine_reimport_issue_query | default(false)
+    - name: Create import project query setting files
+      ansible.builtin.template:
+        src: import_data.yml.j2
+        dest: "{{ redmine_tmp_dir }}/project_query.yml"
+        mode: "0640"
+      vars:
+        redmine_import_data: "{{ redmine_project_queries | default([]) }}"
+      when: >
+        generate_secret_token_result is changed
+        or
+        redmine_reimport_all | default(false)
+        or
+        redmine_reimport_project_query | default(false)
+    - name: Create import time entry query setting files
+      ansible.builtin.template:
+        src: import_data.yml.j2
+        dest: "{{ redmine_tmp_dir }}/time_entry_query.yml"
+        mode: "0640"
+      vars:
+        redmine_import_data: "{{ redmine_time_entry_queries | default([]) }}"
+      when: >
+        generate_secret_token_result is changed
+        or
+        redmine_reimport_all | default(false)
+        or
+        redmine_reimport_time_entry_query | default(false)
     - name: Create import project setting files
       ansible.builtin.template:
         src: import_data.yml.j2
@@ -296,7 +322,7 @@
         redmine_reimport_all | default(false)
         or
         redmine_reimport_note_template | default(false)
-    - name: Update Redmine settings
-      ansible.builtin.command:
-        cmd: bundle exec rails runner {{ redmine_bin_dir }}/import.rb
-        chdir: "{{ redmine_root }}"
+    # - name: Update Redmine settings
+    #   ansible.builtin.command:
+    #     cmd: bundle exec rails runner {{ redmine_bin_dir }}/import.rb
+    #     chdir: "{{ redmine_root }}"

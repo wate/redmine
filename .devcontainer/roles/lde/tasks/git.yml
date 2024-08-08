@@ -11,6 +11,8 @@
       /.vscode/
       /.yardoc/
       /bin/import.rb
+      /lib/tasks/import.rake
+      /lib/tasks/export.rake
       /doc/app/
       /doc/assets/
       /doc/schema/

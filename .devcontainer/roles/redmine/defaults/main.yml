@@ -35,6 +35,7 @@ redmine_gemfile_local: |
 
 ## Redmineの追加環境設定
 redmine_additional_environment: |
+  config.logger = Logger.new('/dev/null')
   config.paths['app/views'] = ['views', 'app/views']
 
 ## Redmineの設定

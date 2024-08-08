@@ -10,7 +10,11 @@ fi
 
 if [ -e "${PWD}/.devcontainer/post_create.yml" ]; then
   cd "${PWD}/.devcontainer" || exit 1
-  ansible-playbook post_create.yml -i localhost, -c local
+  if [ -n "${ANSIBLE_POST_CREATE_TAGS}" ]; then
+    ansible-playbook post_create.yml -i localhost, -c local --tags "${ANSIBLE_POST_CREATE_TAGS}"
+  else
+    ansible-playbook post_create.yml -i localhost, -c local
+  fi
 fi
 
 source ~/.bashrc
